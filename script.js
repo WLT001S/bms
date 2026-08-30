@@ -1,4 +1,4 @@
-(function(){
+document.addEventListener('DOMContentLoaded', function() {
   const root = document.documentElement;
 
   // ---------- Theme toggle ----------
@@ -68,70 +68,97 @@
   // ---------- Processing ----------
   const emailPassRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}:[^\r\n]+$/;
 
+  // Lưu kết quả theo từng file
+  let resultsByFile = {}; // { fileName: [cleanPairs] }
+  let totalStats = { total:0, valid:0, duplicate:0, invalid:0 };
+
   document.getElementById('btn-process').addEventListener('click', async ()=>{
     document.getElementById('processing').classList.remove('hidden');
     const fill = document.getElementById('progress-fill');
     const label = document.getElementById('proc-label');
     fill.style.width='0%';
 
-    let allLines = [];
+    // Reset
+    resultsByFile = {};
+    totalStats = { total:0, valid:0, duplicate:0, invalid:0 };
+
     for(let i=0;i<files.length;i++){
       label.textContent = `Đang đọc ${files[i].name}…`;
       const text = await files[i].text();
       const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);
-      allLines = allLines.concat(lines);
+      totalStats.total += lines.length;
+
+      const seenInFile = new Set();
+      const cleanPairs = [];
+      let dupInFile = 0, invalidInFile = 0;
+
+      lines.forEach(line => {
+        if (!emailPassRe.test(line)) {
+          invalidInFile++;
+          totalStats.invalid++;
+          return;
+        }
+        const email = line.split(':')[0].toLowerCase();
+        if (seenInFile.has(email)) {
+          dupInFile++;
+          totalStats.duplicate++;
+        } else {
+          seenInFile.add(email);
+          cleanPairs.push(line);
+          totalStats.valid++;
+        }
+      });
+
+      resultsByFile[files[i].name] = cleanPairs;
       fill.style.width = `${((i+1)/files.length)*70}%`;
       await new Promise(r=>setTimeout(r,110));
     }
 
-    label.textContent = 'Đang kiểm tra định dạng và loại bỏ trùng lặp…';
-    fill.style.width = '90%';
-    await new Promise(r=>setTimeout(r,180));
-
-    let total = allLines.length;
-    let valid = 0, duplicate = 0, invalid = 0;
-    const seen = new Set();  // lưu email đã thấy (thường)
-    const cleanPairs = [];
-
-    allLines.forEach(line => {
-      if (!emailPassRe.test(line)) {
-        invalid++;
-        return;
-      }
-      const email = line.split(':')[0].toLowerCase();
-      if (seen.has(email)) {
-        duplicate++;
-      } else {
-        seen.add(email);
-        cleanPairs.push(line);
-        valid++;
-      }
-    });
-
-    fill.style.width = '100%';
     label.textContent = 'Hoàn tất.';
+    fill.style.width = '100%';
     await new Promise(r=>setTimeout(r,220));
     document.getElementById('processing').classList.add('hidden');
 
-    window._cleanPairs = cleanPairs;
-    showResults(total, valid, duplicate, invalid);
+    // Cập nhật giao diện kết quả
+    showResults();
     goToStage(2);
   });
 
-  // ---------- Results ----------
-  function showResults(total, valid, dupCount, invalidCount){
-    document.getElementById('s-total').textContent = total;
-    document.getElementById('s-valid').textContent = valid;
-    document.getElementById('s-dup').textContent = dupCount;
-    document.getElementById('s-invalid').textContent = invalidCount;
-    document.getElementById('final-count').textContent = valid + ' tài khoản sẵn sàng';
+  // ---------- Hiển thị kết quả ----------
+  function showResults(){
+    document.getElementById('s-total').textContent = totalStats.total;
+    document.getElementById('s-valid').textContent = totalStats.valid;
+    document.getElementById('s-dup').textContent = totalStats.duplicate;
+    document.getElementById('s-invalid').textContent = totalStats.invalid;
+    document.getElementById('final-count').textContent = totalStats.valid + ' tài khoản sẵn sàng';
 
+    // Gom tất cả clean pairs để hiển thị và tìm kiếm
+    const allCleanPairs = Object.values(resultsByFile).flat();
+    window._cleanPairs = allCleanPairs;
+
+    // Phân tích domain
     const domains = {};
-    window._cleanPairs.forEach(pair=>{
+    allCleanPairs.forEach(pair=>{
       const email = pair.split(':')[0];
       const d = email.split('@')[1];
-      domains[d] = (domains[d]||0)+1;
+      if (d) domains[d] = (domains[d]||0)+1;
     });
+    const domainList = document.getElementById('domain-list');
+    domainList.innerHTML = '';
+    const totalValid = totalStats.valid || 1;
+    Object.entries(domains).sort((a,b)=>b[1]-a[1]).forEach(([domain, count]) => {
+      const percent = ((count / totalValid) * 100).toFixed(1);
+      const li = document.createElement('li');
+      li.className = 'domain-item';
+      li.innerHTML = `
+        <span class="domain-name">${domain}</span>
+        <div class="domain-bar"><div class="domain-bar-fill" style="width:${percent}%"></div></div>
+        <span class="domain-count">${count} (${percent}%)</span>
+      `;
+      domainList.appendChild(li);
+    });
+
+    // Populate domain filter
     const domainFilter = document.getElementById('domain-filter');
     domainFilter.innerHTML = '<option value="">Mọi domain</option>' +
       Object.keys(domains).sort((a,b)=>domains[b]-domains[a])
@@ -163,9 +190,19 @@
   document.getElementById('btn-back-1').addEventListener('click', ()=> goToStage(1));
 
   // ---------- Download ----------
+  function downloadBlob(content, mime, filename) {
+    const blob = new Blob([content], {type: mime});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // Tải file gộp
   document.getElementById('btn-download').addEventListener('click', ()=>{
     const format = document.getElementById('export-format').value;
-    const pairs = window._cleanPairs || [];
+    const pairs = Object.values(resultsByFile).flat();
     let content, mime, filename;
     if (format === 'csv') {
       content = 'email,password\n' + pairs.map(p=>{
@@ -175,23 +212,86 @@
       }).join('\n');
       mime = 'text/csv';
       filename = 'clean-list.csv';
+    } else if (format === 'json') {
+      content = JSON.stringify(pairs.map(p=>{
+        const [email, ...passParts] = p.split(':');
+        return { email, password: passParts.join(':') };
+      }), null, 2);
+      mime = 'application/json';
+      filename = 'clean-list.json';
     } else {
       content = pairs.join('\n');
       mime = 'text/plain';
       filename = 'clean-list.txt';
     }
-    const blob = new Blob([content], {type: mime});
+    downloadBlob(content, mime, filename);
+  });
+
+  // Tải ZIP chứa từng file riêng
+  document.getElementById('btn-download-zip').addEventListener('click', async ()=>{
+    if (Object.keys(resultsByFile).length === 0) return;
+    const zip = new JSZip();
+    const folder = zip.folder('filtered_results');
+    for (const [fileName, pairs] of Object.entries(resultsByFile)) {
+      if (pairs.length > 0) {
+        const cleanName = fileName.replace(/\.[^/.]+$/, '') + '_filtered.txt';
+        folder.file(cleanName, pairs.join('\n'));
+      }
+    }
+    const blob = await zip.generateAsync({ type: 'blob' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url; a.download = filename;
+    a.href = url;
+    a.download = 'filtered_results.zip';
     a.click();
     URL.revokeObjectURL(url);
+  });
+
+  // Xem và tải từng file riêng
+  const individualModal = document.getElementById('individual-modal');
+  const individualFileList = document.getElementById('individual-file-list');
+  document.getElementById('btn-show-individual').addEventListener('click', ()=>{
+    individualFileList.innerHTML = '';
+    for (const [fileName, pairs] of Object.entries(resultsByFile)) {
+      const li = document.createElement('li');
+      li.innerHTML = `
+        <span>${fileName} (${pairs.length} dòng)</span>
+        <button class="download-btn" title="Tải file này"><i class="fas fa-download"></i></button>
+      `;
+      li.querySelector('.download-btn').addEventListener('click', ()=>{
+        const content = pairs.join('\n');
+        const format = document.getElementById('export-format').value;
+        if (format === 'csv') {
+          const csv = 'email,password\n' + pairs.map(p=>{
+            const [email, ...passParts] = p.split(':');
+            return `${email},${passParts.join(':')}`;
+          }).join('\n');
+          downloadBlob(csv, 'text/csv', fileName.replace(/\.[^/.]+$/, '') + '_filtered.csv');
+        } else if (format === 'json') {
+          const json = JSON.stringify(pairs.map(p=>{
+            const [email, ...passParts] = p.split(':');
+            return { email, password: passParts.join(':') };
+          }), null, 2);
+          downloadBlob(json, 'application/json', fileName.replace(/\.[^/.]+$/, '') + '_filtered.json');
+        } else {
+          downloadBlob(content, 'text/plain', fileName.replace(/\.[^/.]+$/, '') + '_filtered.txt');
+        }
+      });
+      individualFileList.appendChild(li);
+    }
+    individualModal.classList.remove('hidden');
+  });
+
+  document.getElementById('btn-close-individual').addEventListener('click', ()=>{
+    individualModal.classList.add('hidden');
   });
 
   // ---------- Reset ----------
   document.getElementById('btn-reset').addEventListener('click', ()=>{
     files = [];
+    resultsByFile = {};
+    totalStats = { total:0, valid:0, duplicate:0, invalid:0 };
     renderFileList();
     goToStage(1);
   });
-})();
+});
