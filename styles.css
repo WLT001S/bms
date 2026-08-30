@@ -49,7 +49,7 @@ body{
   overflow-x:hidden;
 }
 
-/* film-grain + glow backdrop */
+/* film-grain + glow backdrop, sits behind everything */
 body::before{
   content:'';
   position:fixed; inset:-15%;
@@ -262,6 +262,7 @@ h1 .accent{ color:var(--lime); }
 .stat.good{ border-color: rgba(203,255,107,.35); background: var(--lime-dim); }
 .stat.bad{ border-color: rgba(255,122,92,.32); background: var(--coral-dim); }
 
+/* toolbar */
 .toolbar{ display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; margin-bottom:1rem; }
 .search{
   flex:1; min-width:200px; display:flex; align-items:center; gap:.6rem;
@@ -290,17 +291,9 @@ select:focus-visible, .search:focus-within{ outline:2px solid var(--lime); outli
 
 footer{ text-align:center; padding:2.2rem; color:var(--text-dim); font-size:.82rem; font-family:'JetBrains Mono', monospace; position:relative; z-index:2; }
 
-@media (max-width: 860px){
-  .hero{ grid-template-columns:1fr; padding-top:3rem; }
-  .workbench{ grid-template-columns:1fr; }
-  .rail{ position:static; flex-direction:row; overflow-x:auto; gap:1.4rem; padding-bottom:.5rem; }
-  .rail-step{ border-left:none; border-bottom:2px solid var(--line); padding-left:0; padding-bottom:.8rem; white-space:nowrap; }
-  .rail-step.active{ border-left-color:transparent; border-bottom-color:var(--lime); }
-  .stat-grid{ grid-template-columns:repeat(2,1fr); }
-  header{ padding:1rem 1.2rem; }
-}
-
-/* Domain stats */
+/* ================================================================
+   PHẦN BỔ SUNG: Domain stats + modal xem file riêng
+   ================================================================ */
 .domain-stats {
   margin: 1.2rem 0;
 }
@@ -348,7 +341,7 @@ footer{ text-align:center; padding:2.2rem; color:var(--text-dim); font-size:.82r
   color: var(--text-dim);
 }
 
-/* Modal for individual file download */
+/* Modal overlay (cho file riêng) */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -372,6 +365,7 @@ footer{ text-align:center; padding:2.2rem; color:var(--text-dim); font-size:.82r
 .small-modal h3 {
   font-family: 'Fraunces', serif;
   margin-bottom: 1rem;
+  font-size: 1.2rem;
 }
 .individual-file-list {
   list-style: none;
@@ -393,7 +387,18 @@ footer{ text-align:center; padding:2.2rem; color:var(--text-dim); font-size:.82r
   color: var(--lime);
   cursor: pointer;
   font-size: 1.2rem;
+  transition: transform 0.2s;
 }
 .individual-file-list .download-btn:hover {
   transform: scale(1.2);
+}
+
+@media (max-width: 860px){
+  .hero{ grid-template-columns:1fr; padding-top:3rem; }
+  .workbench{ grid-template-columns:1fr; }
+  .rail{ position:static; flex-direction:row; overflow-x:auto; gap:1.4rem; padding-bottom:.5rem; }
+  .rail-step{ border-left:none; border-bottom:2px solid var(--line); padding-left:0; padding-bottom:.8rem; white-space:nowrap; }
+  .rail-step.active{ border-left-color:transparent; border-bottom-color:var(--lime); }
+  .stat-grid{ grid-template-columns:repeat(2,1fr); }
+  header{ padding:1rem 1.2rem; }
 }
