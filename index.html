@@ -7,6 +7,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,500;0,9..144,600;1,9..144,500&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="styles.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
 <svg class="grain" width="0" height="0">
@@ -104,6 +105,12 @@
         <div class="stat bad"><span class="n" id="s-invalid">0</span><span class="l">Không hợp lệ</span></div>
       </div>
 
+      <!-- Domain stats -->
+      <div class="domain-stats">
+        <h4><i class="fas fa-chart-pie"></i> Phân tích domain</h4>
+        <ul id="domain-list" class="domain-list"></ul>
+      </div>
+
       <div class="toolbar">
         <div class="search">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>
@@ -134,9 +141,19 @@
         <select id="export-format">
           <option value="txt">TXT (email:password)</option>
           <option value="csv">CSV (email,password)</option>
+          <option value="json">JSON</option>
         </select>
         <button class="btn btn-ghost" id="btn-reset">Xử lý danh sách khác</button>
-        <button class="btn btn-primary" id="btn-download">Tải file</button>
+        <button class="btn btn-primary" id="btn-download">Tải file gộp</button>
+        <button class="btn btn-ghost" id="btn-download-zip">Tải ZIP (từng file)</button>
+        <button class="btn btn-ghost" id="btn-show-individual">Xem file riêng</button>
+      </div>
+      <div id="individual-modal" class="modal-overlay hidden">
+        <div class="modal small-modal">
+          <h3>Chọn file để tải</h3>
+          <ul id="individual-file-list"></ul>
+          <button class="btn btn-ghost" id="btn-close-individual">Đóng</button>
+        </div>
       </div>
     </section>
 
@@ -145,6 +162,6 @@
 
 <footer>Xử lý cục bộ trên trình duyệt — không file nào được gửi lên máy chủ.</footer>
 
-<script src="script.js" defer></script>
+<script src="script.js"></script>
 </body>
 </html>
