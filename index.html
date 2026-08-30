@@ -3,16 +3,29 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Email:Password Filter - An toàn & Bảo mật</title>
+  <title>MailFilter Pro - Lọc Email:Password An Toàn</title>
   <link rel="stylesheet" href="styles.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
   <!-- Overlay cảnh báo -->
   <div id="warning-overlay" class="overlay">
-    <div class="modal">
-      <div class="modal-icon">
-        <i class="fas fa-shield-alt"></i>
+    <div class="modal glass-card">
+      <div class="modal-logo">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="64" y2="64">
+              <stop offset="0%" stop-color="#6C63FF"/>
+              <stop offset="100%" stop-color="#3AB4FF"/>
+            </linearGradient>
+          </defs>
+          <rect x="4" y="8" width="56" height="48" rx="8" fill="url(#logoGrad)" opacity="0.2"/>
+          <path d="M12 20L32 34L52 20V48C52 50.2091 50.2091 52 48 52H16C13.7909 52 12 50.2091 12 48V20Z" fill="url(#logoGrad)" fill-opacity="0.5"/>
+          <path d="M12 20L32 34L52 20" stroke="url(#logoGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="48" cy="20" r="8" fill="#FF6B6B" stroke="white" stroke-width="2"/>
+          <path d="M45 20L47 22L51 17" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
       </div>
       <h2>Cảnh báo bảo mật</h2>
       <p>
@@ -33,43 +46,119 @@
 
   <!-- Nội dung chính -->
   <div id="main-content" class="main-content hidden">
-    <header class="header">
-      <h1><i class="fas fa-envelope"></i> Email:Password Filter</h1>
+    <header class="header glass">
+      <div class="logo-container">
+        <svg width="36" height="36" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="logoGradHeader" x1="0" y1="0" x2="64" y2="64">
+              <stop offset="0%" stop-color="#6C63FF"/>
+              <stop offset="100%" stop-color="#3AB4FF"/>
+            </linearGradient>
+          </defs>
+          <rect x="4" y="8" width="56" height="48" rx="8" fill="url(#logoGradHeader)" opacity="0.2"/>
+          <path d="M12 20L32 34L52 20V48C52 50.2091 50.2091 52 48 52H16C13.7909 52 12 50.2091 12 48V20Z" fill="url(#logoGradHeader)" fill-opacity="0.5"/>
+          <path d="M12 20L32 34L52 20" stroke="url(#logoGradHeader)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        <h1>MailFilter <span>Pro</span></h1>
+      </div>
       <button id="theme-toggle" class="theme-toggle" aria-label="Chuyển đổi chế độ sáng/tối">
         <i class="fas fa-moon"></i>
       </button>
     </header>
 
     <main class="container">
-      <div class="upload-area" id="upload-area">
-        <i class="fas fa-cloud-upload-alt"></i>
-        <p>Kéo thả file vào đây hoặc <span class="browse">chọn file</span></p>
-        <input type="file" id="file-input" accept=".txt,.csv,.log,.text,.dat,.lst,.json,.xml,.html,.md,.rtf,.ini,.conf,.properties,.yaml,.yml" hidden>
+      <!-- Khu vực chọn file -->
+      <div class="upload-area glass-card" id="upload-area">
+        <div class="upload-icon">
+          <i class="fas fa-cloud-upload-alt"></i>
+        </div>
+        <p>Kéo thả nhiều file vào đây hoặc <span class="browse">chọn file</span></p>
+        <input type="file" id="file-input" accept=".txt,.csv,.log,.text,.dat,.lst,.json,.xml,.html,.md,.rtf,.ini,.conf,.properties,.yaml,.yml" multiple hidden>
         <small>Hỗ trợ mọi định dạng văn bản. Chỉ giữ lại dòng có dạng email:password hợp lệ.</small>
       </div>
 
-      <div id="processing" class="processing hidden">
-        <div class="spinner"></div>
-        <p>Đang xử lý file...</p>
+      <!-- Danh sách file đã chọn -->
+      <div id="file-list-container" class="file-list-container glass-card hidden">
+        <h3><i class="fas fa-folder-open"></i> Danh sách file đã chọn (<span id="file-count">0</span>)</h3>
+        <ul id="file-list" class="file-list"></ul>
+        <div class="file-list-actions">
+          <button id="btn-clear-all" class="btn btn-secondary btn-sm"><i class="fas fa-trash"></i> Xóa tất cả</button>
+          <button id="btn-process" class="btn btn-primary"><i class="fas fa-play"></i> Xử lý tất cả</button>
+        </div>
       </div>
 
-      <div id="result" class="result hidden">
-        <div class="result-stats">
-          <span><i class="fas fa-file-alt"></i> Tổng dòng: <strong id="total-lines">0</strong></span>
-          <span><i class="fas fa-check-circle"></i> Dòng hợp lệ: <strong id="valid-lines">0</strong></span>
-          <span><i class="fas fa-trash-alt"></i> Đã loại bỏ: <strong id="removed-lines">0</strong></span>
+      <!-- Processing -->
+      <div id="processing" class="processing glass-card hidden">
+        <div class="spinner"></div>
+        <p id="processing-text">Đang xử lý...</p>
+        <div class="progress-bar">
+          <div class="progress-fill" id="progress-fill"></div>
         </div>
+      </div>
+
+      <!-- Kết quả -->
+      <div id="result" class="result glass-card hidden">
+        <div class="result-header">
+          <h2><i class="fas fa-check-circle"></i> Kết quả xử lý</h2>
+          <button id="btn-close-result" class="btn-close" title="Đóng"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="result-stats">
+          <div class="stat-card">
+            <i class="fas fa-file-alt"></i>
+            <span class="stat-label">Số file</span>
+            <span class="stat-value" id="total-files">0</span>
+          </div>
+          <div class="stat-card">
+            <i class="fas fa-list"></i>
+            <span class="stat-label">Tổng dòng</span>
+            <span class="stat-value" id="total-lines">0</span>
+          </div>
+          <div class="stat-card highlight">
+            <i class="fas fa-check-circle"></i>
+            <span class="stat-label">Dòng hợp lệ</span>
+            <span class="stat-value" id="valid-lines">0</span>
+          </div>
+          <div class="stat-card">
+            <i class="fas fa-trash-alt"></i>
+            <span class="stat-label">Đã loại bỏ</span>
+            <span class="stat-value" id="removed-lines">0</span>
+          </div>
+        </div>
+
+        <!-- Thống kê domain -->
+        <div id="domain-stats" class="domain-stats">
+          <h3><i class="fas fa-chart-pie"></i> Top 5 domain email</h3>
+          <div id="domain-list" class="domain-list"></div>
+        </div>
+
+        <!-- Tìm kiếm -->
+        <div class="search-box">
+          <i class="fas fa-search"></i>
+          <input type="text" id="search-input" placeholder="Tìm kiếm trong kết quả...">
+        </div>
+
+        <!-- Danh sách kết quả có thể chỉnh sửa -->
+        <div class="result-list-container">
+          <h3>Danh sách kết quả (click để xóa dòng)</h3>
+          <ul id="result-list" class="result-list"></ul>
+          <p class="result-count" id="result-count-display"></p>
+        </div>
+
         <div class="result-actions">
+          <div class="export-options">
+            <label for="export-format">Định dạng xuất:</label>
+            <select id="export-format">
+              <option value="txt">TXT (mỗi dòng một email:password)</option>
+              <option value="csv">CSV (email,password)</option>
+            </select>
+          </div>
           <button id="btn-download" class="btn btn-download"><i class="fas fa-download"></i> Tải file kết quả</button>
           <button id="btn-reset" class="btn btn-reset"><i class="fas fa-undo"></i> Xử lý file khác</button>
         </div>
-        <div class="preview">
-          <h3>Xem trước (tối đa 50 dòng)</h3>
-          <pre id="preview-content"></pre>
-        </div>
       </div>
 
-      <div id="auto-delete-timer" class="timer hidden">
+      <!-- Đồng hồ đếm ngược -->
+      <div id="auto-delete-timer" class="timer glass hidden">
         <i class="fas fa-clock"></i> Dữ liệu sẽ tự động xóa sau: <span id="countdown">15:00</span>
       </div>
     </main>
@@ -80,7 +169,7 @@
   </div>
 
   <!-- Thông báo từ chối -->
-  <div id="denied-message" class="denied hidden">
+  <div id="denied-message" class="denied glass-card hidden">
     <i class="fas fa-lock"></i>
     <h2>Bạn đã từ chối điều khoản</h2>
     <p>Ứng dụng không thể hoạt động nếu không có sự đồng ý của bạn.</p>
