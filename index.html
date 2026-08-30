@@ -3,44 +3,39 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MailFilter Pro Ultimate - Lọc Email:Password Siêu Tốc</title>
+  <title>MailFilter Pro – Lọc Email:Password An Toàn</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 </head>
 <body>
   <!-- Overlay cảnh báo -->
   <div id="warning-overlay" class="overlay">
     <div class="modal glass-card">
       <div class="modal-logo">
-        <svg width="80" height="80" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <linearGradient id="logoGrad" x1="0" y1="0" x2="80" y2="80">
+            <linearGradient id="modalGrad" x1="0" y1="0" x2="72" y2="72">
               <stop offset="0%" stop-color="#6C63FF"/>
               <stop offset="100%" stop-color="#3AB4FF"/>
             </linearGradient>
           </defs>
-          <rect x="6" y="10" width="68" height="60" rx="10" fill="url(#logoGrad)" opacity="0.2"/>
-          <path d="M14 26L40 42L66 26V56C66 58.2091 64.2091 60 62 60H18C15.7909 60 14 58.2091 14 56V26Z" fill="url(#logoGrad)" fill-opacity="0.5"/>
-          <path d="M14 26L40 42L66 26" stroke="url(#logoGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="62" cy="22" r="10" fill="#FF6B6B" stroke="white" stroke-width="2"/>
-          <path d="M58 22L61 25L67 18" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="8" y="10" width="56" height="52" rx="10" fill="url(#modalGrad)" opacity="0.15"/>
+          <path d="M16 28L36 42L56 28V52C56 54.2091 54.2091 56 52 56H20C17.7909 56 16 54.2091 16 52V28Z" fill="url(#modalGrad)" fill-opacity="0.5"/>
+          <path d="M16 28L36 42L56 28" stroke="url(#modalGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <h2>Cảnh báo bảo mật</h2>
-      <p>
-        Ứng dụng này sẽ <strong>xử lý file của bạn hoàn toàn trên trình duyệt</strong>. 
-        Không có dữ liệu nào được tải lên máy chủ. 
-        Kết quả sẽ tự động bị xóa khỏi bộ nhớ sau <strong>15 phút</strong> 
-        hoặc ngay khi bạn đóng tab.
+      <h2>Chào mừng đến với MailFilter Pro</h2>
+      <p class="modal-desc">
+        Ứng dụng xử lý file <strong>hoàn toàn trên trình duyệt</strong>, không tải lên máy chủ.
+        Kết quả sẽ tự động bị xóa sau <strong>15 phút</strong> hoặc khi đóng tab.
       </p>
-      <p>
-        Bằng cách nhấn "Đồng ý", bạn xác nhận rằng bạn hiểu và chấp nhận các điều khoản trên.
+      <p class="modal-warning">
+        <i class="fas fa-shield-alt"></i> Bạn có chắc chắn muốn tiếp tục?
       </p>
       <div class="modal-actions">
-        <button id="btn-disagree" class="btn btn-secondary">Từ chối</button>
-        <button id="btn-agree" class="btn btn-primary">Đồng ý và tiếp tục</button>
+        <button id="btn-disagree" class="btn btn-outline">Từ chối</button>
+        <button id="btn-agree" class="btn btn-primary">Đồng ý</button>
       </div>
     </div>
   </div>
@@ -48,70 +43,68 @@
   <!-- Nội dung chính -->
   <div id="main-content" class="main-content hidden">
     <header class="header glass">
-      <div class="logo-container">
-        <svg width="40" height="40" viewBox="0 0 80 80" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <div class="logo">
+        <svg width="40" height="40" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <linearGradient id="logoGradHeader" x1="0" y1="0" x2="80" y2="80">
+            <linearGradient id="headerGrad" x1="0" y1="0" x2="72" y2="72">
               <stop offset="0%" stop-color="#6C63FF"/>
               <stop offset="100%" stop-color="#3AB4FF"/>
             </linearGradient>
           </defs>
-          <rect x="6" y="10" width="68" height="60" rx="10" fill="url(#logoGradHeader)" opacity="0.2"/>
-          <path d="M14 26L40 42L66 26V56C66 58.2091 64.2091 60 62 60H18C15.7909 60 14 58.2091 14 56V26Z" fill="url(#logoGradHeader)" fill-opacity="0.5"/>
-          <path d="M14 26L40 42L66 26" stroke="url(#logoGradHeader)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="8" y="10" width="56" height="52" rx="10" fill="url(#headerGrad)" opacity="0.2"/>
+          <path d="M16 28L36 42L56 28V52C56 54.2091 54.2091 56 52 56H20C17.7909 56 16 54.2091 16 52V28Z" fill="url(#headerGrad)" fill-opacity="0.5"/>
+          <path d="M16 28L36 42L56 28" stroke="url(#headerGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <h1>MailFilter <span>Pro Ultimate</span></h1>
+        <span class="logo-text">MailFilter <span class="accent">Pro</span></span>
       </div>
-      <div class="header-actions">
-        <button id="theme-toggle" class="theme-toggle" aria-label="Chuyển đổi chế độ sáng/tối">
-          <i class="fas fa-moon"></i>
-        </button>
-      </div>
+      <button id="theme-toggle" class="theme-toggle" aria-label="Đổi giao diện">
+        <i class="fas fa-moon"></i>
+      </button>
     </header>
 
     <main class="container">
       <!-- Khu vực chọn file -->
-      <div class="upload-area glass-card" id="upload-area">
-        <div class="upload-icon">
-          <i class="fas fa-cloud-upload-alt"></i>
-        </div>
+      <section class="upload-area glass-card" id="upload-area">
+        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
         <h2>Kéo thả file vào đây</h2>
         <p>hoặc <span class="browse">chọn file từ máy</span></p>
         <input type="file" id="file-input" accept=".txt,.csv,.log,.text,.dat,.lst,.json,.xml,.html,.md,.rtf,.ini,.conf,.properties,.yaml,.yml" multiple hidden>
-        <small>Hỗ trợ mọi định dạng văn bản. Chỉ giữ lại dòng có dạng email:password hợp lệ.</small>
-      </div>
+        <small>Chấp nhận mọi định dạng văn bản. Chỉ giữ dòng có dạng email:password hợp lệ.</small>
+      </section>
 
       <!-- Danh sách file đã chọn -->
-      <div id="file-list-container" class="file-list-container glass-card hidden">
-        <h3><i class="fas fa-folder-open"></i> Danh sách file đã chọn (<span id="file-count">0</span>)</h3>
-        <ul id="file-list" class="file-list"></ul>
-        <div class="file-list-actions">
-          <button id="btn-clear-all" class="btn btn-secondary btn-sm"><i class="fas fa-trash"></i> Xóa tất cả</button>
-          <button id="btn-process" class="btn btn-primary"><i class="fas fa-play"></i> Xử lý tất cả</button>
+      <section id="file-list-container" class="file-list-container glass-card hidden">
+        <div class="section-title">
+          <h3><i class="fas fa-folder-open"></i> Danh sách file (<span id="file-count">0</span>)</h3>
+          <div class="file-actions">
+            <button id="btn-clear-all" class="btn btn-ghost btn-sm"><i class="fas fa-trash"></i> Xóa tất cả</button>
+            <button id="btn-process" class="btn btn-primary"><i class="fas fa-play"></i> Xử lý</button>
+          </div>
         </div>
-      </div>
+        <ul id="file-list" class="file-list"></ul>
+      </section>
 
-      <!-- Processing -->
-      <div id="processing" class="processing glass-card hidden">
+      <!-- Tiến trình -->
+      <section id="processing" class="processing glass-card hidden">
         <div class="spinner"></div>
         <p id="processing-text">Đang xử lý...</p>
         <div class="progress-bar">
           <div class="progress-fill" id="progress-fill"></div>
         </div>
-      </div>
+      </section>
 
       <!-- Kết quả -->
-      <div id="result" class="result glass-card hidden">
+      <section id="result" class="result glass-card hidden">
         <div class="result-header">
-          <h2><i class="fas fa-check-circle"></i> Kết quả xử lý</h2>
-          <button id="btn-close-result" class="btn-close" title="Đóng"><i class="fas fa-times"></i></button>
+          <h2><i class="fas fa-check-circle"></i> Kết quả</h2>
+          <button id="btn-close-result" class="btn-close"><i class="fas fa-times"></i></button>
         </div>
 
         <!-- Thống kê -->
-        <div class="result-stats">
+        <div class="stats-grid">
           <div class="stat-card">
             <i class="fas fa-file-alt"></i>
-            <span class="stat-label">Số file</span>
+            <span class="stat-label">File</span>
             <span class="stat-value" id="total-files">0</span>
           </div>
           <div class="stat-card">
@@ -121,93 +114,88 @@
           </div>
           <div class="stat-card highlight">
             <i class="fas fa-check-circle"></i>
-            <span class="stat-label">Dòng hợp lệ</span>
+            <span class="stat-label">Hợp lệ</span>
             <span class="stat-value" id="valid-lines">0</span>
           </div>
           <div class="stat-card">
             <i class="fas fa-trash-alt"></i>
-            <span class="stat-label">Đã loại bỏ</span>
+            <span class="stat-label">Loại bỏ</span>
             <span class="stat-value" id="removed-lines">0</span>
           </div>
         </div>
 
-        <!-- Bộ lọc -->
-        <div class="filters">
-          <div class="filter-group">
-            <label><i class="fas fa-filter"></i> Lọc nhanh:</label>
-            <select id="filter-domain">
-              <option value="">Tất cả domain</option>
-            </select>
-            <select id="filter-length">
-              <option value="">Mọi độ dài password</option>
-              <option value="short">Ngắn (≤ 8 ký tự)</option>
-              <option value="medium">Trung bình (9-15 ký tự)</option>
-              <option value="long">Dài (> 15 ký tự)</option>
-            </select>
-          </div>
+        <!-- Bộ lọc và tìm kiếm -->
+        <div class="toolbar">
+          <select id="filter-domain" class="select">
+            <option value="">Tất cả domain</option>
+          </select>
+          <select id="filter-length" class="select">
+            <option value="">Mọi độ dài</option>
+            <option value="short">Ngắn (≤ 8)</option>
+            <option value="medium">Trung bình (9-15)</option>
+            <option value="long">Dài (>15)</option>
+          </select>
           <div class="search-box">
             <i class="fas fa-search"></i>
-            <input type="text" id="search-input" placeholder="Tìm kiếm trong kết quả...">
+            <input type="text" id="search-input" placeholder="Tìm kiếm...">
           </div>
         </div>
 
-        <!-- Thống kê domain -->
-        <div id="domain-stats" class="domain-stats">
-          <h3><i class="fas fa-chart-pie"></i> Top 5 domain email</h3>
+        <!-- Top domain -->
+        <div class="domain-stats">
+          <h3><i class="fas fa-chart-pie"></i> Top 5 domain</h3>
           <div id="domain-list" class="domain-list"></div>
         </div>
 
         <!-- Danh sách kết quả -->
         <div class="result-list-container">
-          <h3>Danh sách kết quả (click để xóa dòng)</h3>
+          <h3>Danh sách (click để xóa dòng)</h3>
           <ul id="result-list" class="result-list"></ul>
           <p class="result-count" id="result-count-display"></p>
         </div>
 
         <!-- Các nút hành động -->
-        <div class="result-actions">
-          <div class="export-options">
-            <label for="export-format">Định dạng:</label>
-            <select id="export-format">
-              <option value="txt">TXT</option>
-              <option value="csv">CSV</option>
-            </select>
-          </div>
-          <button id="btn-download" class="btn btn-download"><i class="fas fa-download"></i> Tải file gộp</button>
-          <button id="btn-download-zip" class="btn btn-download-zip"><i class="fas fa-file-archive"></i> Tải ZIP (riêng từng file)</button>
-          <button id="btn-show-individual" class="btn btn-individual"><i class="fas fa-list-alt"></i> Xem file riêng</button>
-          <button id="btn-copy" class="btn btn-copy"><i class="fas fa-copy"></i> Copy tất cả</button>
-          <button id="btn-reset" class="btn btn-reset"><i class="fas fa-undo"></i> Xử lý file khác</button>
+        <div class="action-buttons">
+          <select id="export-format" class="select">
+            <option value="txt">TXT</option>
+            <option value="csv">CSV</option>
+          </select>
+          <button id="btn-download" class="btn btn-success"><i class="fas fa-download"></i> Tải gộp</button>
+          <button id="btn-download-zip" class="btn btn-warning"><i class="fas fa-file-archive"></i> ZIP</button>
+          <button id="btn-show-individual" class="btn btn-info"><i class="fas fa-list-alt"></i> File riêng</button>
+          <button id="btn-copy" class="btn btn-info"><i class="fas fa-copy"></i> Copy</button>
+          <button id="btn-reset" class="btn btn-outline"><i class="fas fa-undo"></i> Reset</button>
         </div>
-      </div>
+      </section>
 
-      <!-- Modal danh sách file riêng -->
-      <div id="individual-modal" class="modal-overlay hidden">
-        <div class="modal glass-card small-modal">
-          <h3><i class="fas fa-list"></i> Chọn file để tải</h3>
-          <ul id="individual-file-list" class="individual-file-list"></ul>
-          <button id="btn-close-individual" class="btn btn-secondary btn-sm">Đóng</button>
-        </div>
-      </div>
-
-      <!-- Đồng hồ đếm ngược -->
+      <!-- Timer -->
       <div id="auto-delete-timer" class="timer glass hidden">
-        <i class="fas fa-clock"></i> Dữ liệu sẽ tự động xóa sau: <span id="countdown">15:00</span>
+        <i class="fas fa-clock"></i> Dữ liệu sẽ bị xóa sau: <span id="countdown">15:00</span>
       </div>
     </main>
 
     <footer class="footer">
-      <p>🔒 Dữ liệu của bạn không bao giờ rời khỏi trình duyệt</p>
+      <p>🔒 Dữ liệu không rời khỏi trình duyệt của bạn</p>
     </footer>
+  </div>
+
+  <!-- Modal danh sách file riêng -->
+  <div id="individual-modal" class="modal-overlay hidden">
+    <div class="modal glass-card small-modal">
+      <h3><i class="fas fa-list"></i> Chọn file để tải</h3>
+      <ul id="individual-file-list" class="individual-file-list"></ul>
+      <button id="btn-close-individual" class="btn btn-secondary btn-sm">Đóng</button>
+    </div>
   </div>
 
   <!-- Thông báo từ chối -->
   <div id="denied-message" class="denied glass-card hidden">
     <i class="fas fa-lock"></i>
-    <h2>Bạn đã từ chối điều khoản</h2>
-    <p>Ứng dụng không thể hoạt động nếu không có sự đồng ý của bạn.</p>
+    <h2>Bạn đã từ chối</h2>
+    <p>Ứng dụng không thể hoạt động nếu không có sự đồng ý.</p>
   </div>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
