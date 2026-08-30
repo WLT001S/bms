@@ -3,179 +3,185 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MailFilter Pro – Lọc Email:Password An Toàn</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>MailFilter Pro – Lọc Email:Password Siêu Tốc</title>
+  <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 </head>
 <body>
   <!-- Overlay cảnh báo -->
   <div id="warning-overlay" class="overlay">
     <div class="modal glass-card">
       <div class="modal-logo">
-        <svg width="72" height="72" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <linearGradient id="modalGrad" x1="0" y1="0" x2="72" y2="72">
-              <stop offset="0%" stop-color="#6C63FF"/>
-              <stop offset="100%" stop-color="#3AB4FF"/>
+            <linearGradient id="warnGrad" x1="0" y1="0" x2="64" y2="64">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="100%" stop-color="#0ea5e9"/>
             </linearGradient>
           </defs>
-          <rect x="8" y="10" width="56" height="52" rx="10" fill="url(#modalGrad)" opacity="0.15"/>
-          <path d="M16 28L36 42L56 28V52C56 54.2091 54.2091 56 52 56H20C17.7909 56 16 54.2091 16 52V28Z" fill="url(#modalGrad)" fill-opacity="0.5"/>
-          <path d="M16 28L36 42L56 28" stroke="url(#modalGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="4" y="6" width="56" height="52" rx="10" fill="url(#warnGrad)" opacity="0.15"/>
+          <path d="M12 26L32 40L52 26V50C52 52.2091 50.2091 54 48 54H16C13.7909 54 12 52.2091 12 50V26Z" fill="url(#warnGrad)" fill-opacity="0.6"/>
+          <path d="M12 26L32 40L52 26" stroke="url(#warnGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </div>
-      <h2>Chào mừng đến với MailFilter Pro</h2>
-      <p class="modal-desc">
-        Ứng dụng xử lý file <strong>hoàn toàn trên trình duyệt</strong>, không tải lên máy chủ.
-        Kết quả sẽ tự động bị xóa sau <strong>15 phút</strong> hoặc khi đóng tab.
-      </p>
-      <p class="modal-warning">
-        <i class="fas fa-shield-alt"></i> Bạn có chắc chắn muốn tiếp tục?
+      <h2>Bảo mật là trên hết</h2>
+      <p>
+        Ứng dụng xử lý file <strong>hoàn toàn trên trình duyệt</strong>, không gửi dữ liệu đi đâu.
+        Kết quả sẽ tự động bị xóa sau <strong>15 phút</strong> hoặc khi bạn đóng tab.
       </p>
       <div class="modal-actions">
         <button id="btn-disagree" class="btn btn-outline">Từ chối</button>
-        <button id="btn-agree" class="btn btn-primary">Đồng ý</button>
+        <button id="btn-agree" class="btn btn-primary">Đồng ý và tiếp tục</button>
       </div>
     </div>
   </div>
 
   <!-- Nội dung chính -->
-  <div id="main-content" class="main-content hidden">
-    <header class="header glass">
-      <div class="logo">
-        <svg width="40" height="40" viewBox="0 0 72 72" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <div id="app" class="app hidden">
+    <!-- Header -->
+    <header class="topbar">
+      <div class="logo-area">
+        <svg width="32" height="32" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
           <defs>
-            <linearGradient id="headerGrad" x1="0" y1="0" x2="72" y2="72">
-              <stop offset="0%" stop-color="#6C63FF"/>
-              <stop offset="100%" stop-color="#3AB4FF"/>
+            <linearGradient id="logoGrad" x1="0" y1="0" x2="64" y2="64">
+              <stop offset="0%" stop-color="#6366f1"/>
+              <stop offset="100%" stop-color="#0ea5e9"/>
             </linearGradient>
           </defs>
-          <rect x="8" y="10" width="56" height="52" rx="10" fill="url(#headerGrad)" opacity="0.2"/>
-          <path d="M16 28L36 42L56 28V52C56 54.2091 54.2091 56 52 56H20C17.7909 56 16 54.2091 16 52V28Z" fill="url(#headerGrad)" fill-opacity="0.5"/>
-          <path d="M16 28L36 42L56 28" stroke="url(#headerGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+          <rect x="4" y="6" width="56" height="52" rx="10" fill="url(#logoGrad)" opacity="0.2"/>
+          <path d="M12 26L32 40L52 26V50C52 52.2091 50.2091 54 48 54H16C13.7909 54 12 52.2091 12 50V26Z" fill="url(#logoGrad)" fill-opacity="0.6"/>
+          <path d="M12 26L32 40L52 26" stroke="url(#logoGrad)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
-        <span class="logo-text">MailFilter <span class="accent">Pro</span></span>
+        <span class="app-name">MailFilter <span class="badge">PRO</span></span>
       </div>
-      <button id="theme-toggle" class="theme-toggle" aria-label="Đổi giao diện">
-        <i class="fas fa-moon"></i>
-      </button>
+      <div class="topbar-actions">
+        <button id="theme-toggle" class="icon-btn" aria-label="Đổi giao diện">
+          <i class="fas fa-moon"></i>
+        </button>
+      </div>
     </header>
 
-    <main class="container">
-      <!-- Khu vực chọn file -->
-      <section class="upload-area glass-card" id="upload-area">
-        <div class="upload-icon"><i class="fas fa-cloud-upload-alt"></i></div>
-        <h2>Kéo thả file vào đây</h2>
-        <p>hoặc <span class="browse">chọn file từ máy</span></p>
-        <input type="file" id="file-input" accept=".txt,.csv,.log,.text,.dat,.lst,.json,.xml,.html,.md,.rtf,.ini,.conf,.properties,.yaml,.yml" multiple hidden>
-        <small>Chấp nhận mọi định dạng văn bản. Chỉ giữ dòng có dạng email:password hợp lệ.</small>
-      </section>
-
-      <!-- Danh sách file đã chọn -->
-      <section id="file-list-container" class="file-list-container glass-card hidden">
-        <div class="section-title">
-          <h3><i class="fas fa-folder-open"></i> Danh sách file (<span id="file-count">0</span>)</h3>
-          <div class="file-actions">
-            <button id="btn-clear-all" class="btn btn-ghost btn-sm"><i class="fas fa-trash"></i> Xóa tất cả</button>
-            <button id="btn-process" class="btn btn-primary"><i class="fas fa-play"></i> Xử lý</button>
+    <!-- Main layout -->
+    <div class="main-layout">
+      <!-- Left panel: Upload & File list -->
+      <aside class="left-panel">
+        <section class="upload-card glass-card">
+          <div class="upload-icon">
+            <i class="fas fa-cloud-upload-alt"></i>
           </div>
-        </div>
-        <ul id="file-list" class="file-list"></ul>
-      </section>
+          <h2>Kéo thả file vào đây</h2>
+          <p>hoặc <span class="browse" id="browse-trigger">chọn file từ máy</span></p>
+          <input type="file" id="file-input" accept=".txt,.csv,.log,.text,.dat,.lst,.json,.xml,.html,.md,.rtf,.ini,.conf,.properties,.yaml,.yml" multiple hidden>
+          <small>Hỗ trợ mọi định dạng văn bản</small>
+        </section>
 
-      <!-- Tiến trình -->
-      <section id="processing" class="processing glass-card hidden">
-        <div class="spinner"></div>
-        <p id="processing-text">Đang xử lý...</p>
-        <div class="progress-bar">
-          <div class="progress-fill" id="progress-fill"></div>
-        </div>
-      </section>
-
-      <!-- Kết quả -->
-      <section id="result" class="result glass-card hidden">
-        <div class="result-header">
-          <h2><i class="fas fa-check-circle"></i> Kết quả</h2>
-          <button id="btn-close-result" class="btn-close"><i class="fas fa-times"></i></button>
-        </div>
-
-        <!-- Thống kê -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <i class="fas fa-file-alt"></i>
-            <span class="stat-label">File</span>
-            <span class="stat-value" id="total-files">0</span>
+        <section id="file-list-container" class="file-list-card glass-card hidden">
+          <div class="card-header">
+            <h3><i class="fas fa-folder-open"></i> File đã chọn (<span id="file-count">0</span>)</h3>
+            <button id="btn-clear-all" class="text-btn"><i class="fas fa-trash"></i> Xóa hết</button>
           </div>
-          <div class="stat-card">
-            <i class="fas fa-list"></i>
-            <span class="stat-label">Tổng dòng</span>
-            <span class="stat-value" id="total-lines">0</span>
+          <ul id="file-list" class="file-list"></ul>
+          <button id="btn-process" class="btn btn-primary btn-block">
+            <i class="fas fa-play"></i> Xử lý tất cả
+          </button>
+        </section>
+      </aside>
+
+      <!-- Right panel: Results -->
+      <main class="right-panel">
+        <section id="processing" class="processing-card glass-card hidden">
+          <div class="spinner"></div>
+          <p id="processing-text">Đang xử lý...</p>
+          <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
           </div>
-          <div class="stat-card highlight">
-            <i class="fas fa-check-circle"></i>
-            <span class="stat-label">Hợp lệ</span>
-            <span class="stat-value" id="valid-lines">0</span>
+        </section>
+
+        <section id="result" class="result-card glass-card hidden">
+          <div class="result-header">
+            <h2><i class="fas fa-check-circle"></i> Kết quả xử lý</h2>
+            <button id="btn-close-result" class="icon-btn"><i class="fas fa-times"></i></button>
           </div>
-          <div class="stat-card">
-            <i class="fas fa-trash-alt"></i>
-            <span class="stat-label">Loại bỏ</span>
-            <span class="stat-value" id="removed-lines">0</span>
+
+          <!-- Stats -->
+          <div class="stats-row">
+            <div class="stat">
+              <i class="fas fa-file-alt"></i>
+              <span>File</span>
+              <strong id="total-files">0</strong>
+            </div>
+            <div class="stat">
+              <i class="fas fa-list"></i>
+              <span>Tổng dòng</span>
+              <strong id="total-lines">0</strong>
+            </div>
+            <div class="stat highlight">
+              <i class="fas fa-check-circle"></i>
+              <span>Hợp lệ</span>
+              <strong id="valid-lines">0</strong>
+            </div>
+            <div class="stat">
+              <i class="fas fa-trash-alt"></i>
+              <span>Loại bỏ</span>
+              <strong id="removed-lines">0</strong>
+            </div>
           </div>
-        </div>
 
-        <!-- Bộ lọc và tìm kiếm -->
-        <div class="toolbar">
-          <select id="filter-domain" class="select">
-            <option value="">Tất cả domain</option>
-          </select>
-          <select id="filter-length" class="select">
-            <option value="">Mọi độ dài</option>
-            <option value="short">Ngắn (≤ 8)</option>
-            <option value="medium">Trung bình (9-15)</option>
-            <option value="long">Dài (>15)</option>
-          </select>
-          <div class="search-box">
-            <i class="fas fa-search"></i>
-            <input type="text" id="search-input" placeholder="Tìm kiếm...">
+          <!-- Toolbar -->
+          <div class="toolbar">
+            <select id="filter-domain" class="select">
+              <option value="">Tất cả domain</option>
+            </select>
+            <select id="filter-length" class="select">
+              <option value="">Mọi độ dài</option>
+              <option value="short">Ngắn (≤8)</option>
+              <option value="medium">Trung bình (9-15)</option>
+              <option value="long">Dài (>15)</option>
+            </select>
+            <div class="search-box">
+              <i class="fas fa-search"></i>
+              <input type="text" id="search-input" placeholder="Tìm kiếm...">
+            </div>
           </div>
-        </div>
 
-        <!-- Top domain -->
-        <div class="domain-stats">
-          <h3><i class="fas fa-chart-pie"></i> Top 5 domain</h3>
-          <div id="domain-list" class="domain-list"></div>
-        </div>
+          <!-- Domain stats -->
+          <div class="domain-block">
+            <h3><i class="fas fa-chart-pie"></i> Top 5 domain</h3>
+            <div id="domain-list" class="domain-list"></div>
+          </div>
 
-        <!-- Danh sách kết quả -->
-        <div class="result-list-container">
-          <h3>Danh sách (click để xóa dòng)</h3>
-          <ul id="result-list" class="result-list"></ul>
-          <p class="result-count" id="result-count-display"></p>
-        </div>
+          <!-- Result list -->
+          <div class="result-list-block">
+            <h3>Danh sách <span class="muted">(click để xóa dòng)</span></h3>
+            <ul id="result-list" class="result-list"></ul>
+            <p class="result-count" id="result-count-display"></p>
+          </div>
 
-        <!-- Các nút hành động -->
-        <div class="action-buttons">
-          <select id="export-format" class="select">
-            <option value="txt">TXT</option>
-            <option value="csv">CSV</option>
-          </select>
-          <button id="btn-download" class="btn btn-success"><i class="fas fa-download"></i> Tải gộp</button>
-          <button id="btn-download-zip" class="btn btn-warning"><i class="fas fa-file-archive"></i> ZIP</button>
-          <button id="btn-show-individual" class="btn btn-info"><i class="fas fa-list-alt"></i> File riêng</button>
-          <button id="btn-copy" class="btn btn-info"><i class="fas fa-copy"></i> Copy</button>
-          <button id="btn-reset" class="btn btn-outline"><i class="fas fa-undo"></i> Reset</button>
-        </div>
-      </section>
+          <!-- Actions -->
+          <div class="action-buttons">
+            <select id="export-format" class="select">
+              <option value="txt">TXT</option>
+              <option value="csv">CSV</option>
+            </select>
+            <button id="btn-download" class="btn btn-success"><i class="fas fa-download"></i> Tải gộp</button>
+            <button id="btn-download-zip" class="btn btn-warning"><i class="fas fa-file-archive"></i> ZIP</button>
+            <button id="btn-show-individual" class="btn btn-info"><i class="fas fa-list-alt"></i> File riêng</button>
+            <button id="btn-copy" class="btn btn-info"><i class="fas fa-copy"></i> Copy</button>
+            <button id="btn-reset" class="btn btn-outline"><i class="fas fa-undo"></i> Reset</button>
+          </div>
+        </section>
 
-      <!-- Timer -->
-      <div id="auto-delete-timer" class="timer glass hidden">
-        <i class="fas fa-clock"></i> Dữ liệu sẽ bị xóa sau: <span id="countdown">15:00</span>
-      </div>
-    </main>
+        <!-- Timer -->
+        <div id="auto-delete-timer" class="timer glass-card hidden">
+          <i class="fas fa-clock"></i> Dữ liệu sẽ bị xóa sau: <span id="countdown">15:00</span>
+        </div>
+      </main>
+    </div>
 
     <footer class="footer">
-      <p>🔒 Dữ liệu không rời khỏi trình duyệt của bạn</p>
+      <p>🔒 Dữ liệu của bạn không bao giờ rời khỏi trình duyệt</p>
     </footer>
   </div>
 
@@ -195,7 +201,6 @@
     <p>Ứng dụng không thể hoạt động nếu không có sự đồng ý.</p>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
