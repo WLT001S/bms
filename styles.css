@@ -299,3 +299,101 @@ footer{ text-align:center; padding:2.2rem; color:var(--text-dim); font-size:.82r
   .stat-grid{ grid-template-columns:repeat(2,1fr); }
   header{ padding:1rem 1.2rem; }
 }
+
+/* Domain stats */
+.domain-stats {
+  margin: 1.2rem 0;
+}
+.domain-stats h4 {
+  font-family: 'Fraunces', serif;
+  font-size: 1.1rem;
+  margin-bottom: 0.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.domain-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+.domain-item {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.85rem;
+}
+.domain-name {
+  flex: 1;
+  word-break: break-all;
+}
+.domain-bar {
+  flex: 2;
+  height: 6px;
+  background: var(--line);
+  border-radius: 10px;
+  overflow: hidden;
+}
+.domain-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--lime), #9FE04A);
+  border-radius: 10px;
+  transition: width 0.4s ease;
+}
+.domain-count {
+  min-width: 70px;
+  text-align: right;
+  color: var(--text-dim);
+}
+
+/* Modal for individual file download */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(5px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 500;
+}
+.small-modal {
+  background: var(--ink);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 1.5rem;
+  width: 90%;
+  max-width: 450px;
+  max-height: 70vh;
+  overflow-y: auto;
+}
+.small-modal h3 {
+  font-family: 'Fraunces', serif;
+  margin-bottom: 1rem;
+}
+.individual-file-list {
+  list-style: none;
+  margin-bottom: 1rem;
+}
+.individual-file-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+.individual-file-list li:last-child {
+  border-bottom: none;
+}
+.individual-file-list .download-btn {
+  background: none;
+  border: none;
+  color: var(--lime);
+  cursor: pointer;
+  font-size: 1.2rem;
+}
+.individual-file-list .download-btn:hover {
+  transform: scale(1.2);
+}
