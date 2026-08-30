@@ -68,8 +68,7 @@ document.addEventListener('DOMContentLoaded', function() {
   // ---------- Processing ----------
   const emailPassRe = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}:[^\r\n]+$/;
 
-  // Lưu kết quả theo từng file
-  let resultsByFile = {}; // { fileName: [cleanPairs] }
+  let resultsByFile = {};
   let totalStats = { total:0, valid:0, duplicate:0, invalid:0 };
 
   document.getElementById('btn-process').addEventListener('click', async ()=>{
@@ -78,7 +77,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const label = document.getElementById('proc-label');
     fill.style.width='0%';
 
-    // Reset
     resultsByFile = {};
     totalStats = { total:0, valid:0, duplicate:0, invalid:0 };
 
@@ -119,12 +117,10 @@ document.addEventListener('DOMContentLoaded', function() {
     await new Promise(r=>setTimeout(r,220));
     document.getElementById('processing').classList.add('hidden');
 
-    // Cập nhật giao diện kết quả
     showResults();
     goToStage(2);
   });
 
-  // ---------- Hiển thị kết quả ----------
   function showResults(){
     document.getElementById('s-total').textContent = totalStats.total;
     document.getElementById('s-valid').textContent = totalStats.valid;
@@ -132,11 +128,9 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('s-invalid').textContent = totalStats.invalid;
     document.getElementById('final-count').textContent = totalStats.valid + ' tài khoản sẵn sàng';
 
-    // Gom tất cả clean pairs để hiển thị và tìm kiếm
     const allCleanPairs = Object.values(resultsByFile).flat();
     window._cleanPairs = allCleanPairs;
 
-    // Phân tích domain
     const domains = {};
     allCleanPairs.forEach(pair=>{
       const email = pair.split(':')[0];
@@ -158,7 +152,6 @@ document.addEventListener('DOMContentLoaded', function() {
       domainList.appendChild(li);
     });
 
-    // Populate domain filter
     const domainFilter = document.getElementById('domain-filter');
     domainFilter.innerHTML = '<option value="">Mọi domain</option>' +
       Object.keys(domains).sort((a,b)=>domains[b]-domains[a])
@@ -189,7 +182,7 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('btn-goto-3').addEventListener('click', ()=> goToStage(3));
   document.getElementById('btn-back-1').addEventListener('click', ()=> goToStage(1));
 
-  // ---------- Download ----------
+  // ---------- Download helper ----------
   function downloadBlob(content, mime, filename) {
     const blob = new Blob([content], {type: mime});
     const url = URL.createObjectURL(blob);
@@ -207,8 +200,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (format === 'csv') {
       content = 'email,password\n' + pairs.map(p=>{
         const [email, ...passParts] = p.split(':');
-        const password = passParts.join(':');
-        return `${email},${password}`;
+        return `${email},${passParts.join(':')}`;
       }).join('\n');
       mime = 'text/csv';
       filename = 'clean-list.csv';
@@ -247,44 +239,72 @@ document.addEventListener('DOMContentLoaded', function() {
     URL.revokeObjectURL(url);
   });
 
-  // Xem và tải từng file riêng
+  // ---------- Modal individual file ----------
   const individualModal = document.getElementById('individual-modal');
   const individualFileList = document.getElementById('individual-file-list');
-  document.getElementById('btn-show-individual').addEventListener('click', ()=>{
+  const btnShowIndividual = document.getElementById('btn-show-individual');
+  const btnCloseIndividual = document.getElementById('btn-close-individual');
+
+  btnShowIndividual.addEventListener('click', () => {
     individualFileList.innerHTML = '';
-    for (const [fileName, pairs] of Object.entries(resultsByFile)) {
-      const li = document.createElement('li');
-      li.innerHTML = `
-        <span>${fileName} (${pairs.length} dòng)</span>
-        <button class="download-btn" title="Tải file này"><i class="fas fa-download"></i></button>
-      `;
-      li.querySelector('.download-btn').addEventListener('click', ()=>{
-        const content = pairs.join('\n');
-        const format = document.getElementById('export-format').value;
-        if (format === 'csv') {
-          const csv = 'email,password\n' + pairs.map(p=>{
-            const [email, ...passParts] = p.split(':');
-            return `${email},${passParts.join(':')}`;
-          }).join('\n');
-          downloadBlob(csv, 'text/csv', fileName.replace(/\.[^/.]+$/, '') + '_filtered.csv');
-        } else if (format === 'json') {
-          const json = JSON.stringify(pairs.map(p=>{
-            const [email, ...passParts] = p.split(':');
-            return { email, password: passParts.join(':') };
-          }), null, 2);
-          downloadBlob(json, 'application/json', fileName.replace(/\.[^/.]+$/, '') + '_filtered.json');
-        } else {
-          downloadBlob(content, 'text/plain', fileName.replace(/\.[^/.]+$/, '') + '_filtered.txt');
-        }
+    const fileNames = Object.keys(resultsByFile);
+    if (fileNames.length === 0) {
+      individualFileList.innerHTML = '<li>Không có file nào.</li>';
+    } else {
+      fileNames.forEach(fileName => {
+        const pairs = resultsByFile[fileName] || [];
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span>${fileName} (${pairs.length} dòng)</span>
+          <button class="download-btn" title="Tải file này">
+            <i class="fas fa-download"></i>
+          </button>
+        `;
+        const downloadBtn = li.querySelector('.download-btn');
+        downloadBtn.addEventListener('click', () => {
+          downloadSingleFile(fileName, pairs);
+        });
+        individualFileList.appendChild(li);
       });
-      individualFileList.appendChild(li);
     }
     individualModal.classList.remove('hidden');
   });
 
-  document.getElementById('btn-close-individual').addEventListener('click', ()=>{
+  btnCloseIndividual.addEventListener('click', () => {
     individualModal.classList.add('hidden');
   });
+
+  individualModal.addEventListener('click', (e) => {
+    if (e.target === individualModal) {
+      individualModal.classList.add('hidden');
+    }
+  });
+
+  function downloadSingleFile(fileName, pairs) {
+    const format = document.getElementById('export-format').value;
+    const baseName = fileName.replace(/\.[^/.]+$/, '');
+    let content, mime, filename;
+    if (format === 'csv') {
+      content = 'email,password\n' + pairs.map(p => {
+        const [email, ...passParts] = p.split(':');
+        return `${email},${passParts.join(':')}`;
+      }).join('\n');
+      mime = 'text/csv';
+      filename = baseName + '_filtered.csv';
+    } else if (format === 'json') {
+      content = JSON.stringify(pairs.map(p => {
+        const [email, ...passParts] = p.split(':');
+        return { email, password: passParts.join(':') };
+      }), null, 2);
+      mime = 'application/json';
+      filename = baseName + '_filtered.json';
+    } else {
+      content = pairs.join('\n');
+      mime = 'text/plain';
+      filename = baseName + '_filtered.txt';
+    }
+    downloadBlob(content, mime, filename);
+  }
 
   // ---------- Reset ----------
   document.getElementById('btn-reset').addEventListener('click', ()=>{
