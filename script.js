@@ -67,16 +67,25 @@ const validLinesSpan = document.getElementById('valid-lines');
 const removedLinesSpan = document.getElementById('removed-lines');
 const domainList = document.getElementById('domain-list');
 const searchInput = document.getElementById('search-input');
+const filterDomain = document.getElementById('filter-domain');
+const filterLength = document.getElementById('filter-length');
 const resultList = document.getElementById('result-list');
 const resultCountDisplay = document.getElementById('result-count-display');
 const btnDownload = document.getElementById('btn-download');
+const btnDownloadZip = document.getElementById('btn-download-zip');
+const btnShowIndividual = document.getElementById('btn-show-individual');
+const individualModal = document.getElementById('individual-modal');
+const individualFileList = document.getElementById('individual-file-list');
+const btnCloseIndividual = document.getElementById('btn-close-individual');
+const btnCopy = document.getElementById('btn-copy');
 const btnReset = document.getElementById('btn-reset');
 const exportFormat = document.getElementById('export-format');
 const timerDiv = document.getElementById('auto-delete-timer');
 const countdownSpan = document.getElementById('countdown');
 
 let selectedFiles = []; // File chờ xử lý
-let filteredData = [];  // Kết quả hợp lệ (mảng các chuỗi email:password)
+let filteredData = [];  // Kết quả gộp tất cả (mảng các chuỗi email:password)
+let resultByFile = {};  // Đối tượng: { fileName: [validLines] }
 let currentDisplayData = []; // Dữ liệu đang hiển thị sau lọc/tìm kiếm
 let autoDeleteTimerId = null;
 let countdownInterval = null;
@@ -187,6 +196,7 @@ async function processAllFiles(files) {
   timerDiv.classList.add('hidden');
 
   filteredData = [];
+  resultByFile = {};
   let totalLines = 0;
   let totalValid = 0;
 
@@ -201,6 +211,7 @@ async function processAllFiles(files) {
       const validLines = lines.filter(isValidEmailPassword);
       totalValid += validLines.length;
       filteredData.push(...validLines);
+      resultByFile[file.name] = validLines; // Lưu kết quả riêng cho từng file
     } catch (error) {
       console.error(`Lỗi khi đọc file ${file.name}:`, error);
       alert(`Có lỗi khi đọc file ${file.name}. File sẽ bị bỏ qua.`);
@@ -220,6 +231,9 @@ async function processAllFiles(files) {
     totalLinesSpan.textContent = totalLines;
     validLinesSpan.textContent = totalValid;
     removedLinesSpan.textContent = totalRemoved;
+
+    // Cập nhật filter domain
+    populateDomainFilter(filteredData);
 
     // Hiển thị thống kê domain
     displayDomainStats(filteredData);
@@ -291,17 +305,60 @@ function displayDomainStats(data) {
   });
 }
 
-// ============ TÌM KIẾM & HIỂN THỊ DANH SÁCH ============
-searchInput.addEventListener('input', () => {
-  const query = searchInput.value.trim().toLowerCase();
-  if (!query) {
-    currentDisplayData = [...filteredData];
-  } else {
-    currentDisplayData = filteredData.filter(line => line.toLowerCase().includes(query));
-  }
-  renderResultList(currentDisplayData);
-});
+// ============ LỌC & TÌM KIẾM ============
+function populateDomainFilter(data) {
+  const domains = new Set();
+  data.forEach(line => {
+    const email = line.split(':')[0];
+    const domain = email.split('@')[1];
+    if (domain) domains.add(domain);
+  });
+  filterDomain.innerHTML = '<option value="">Tất cả domain</option>';
+  domains.forEach(domain => {
+    const option = document.createElement('option');
+    option.value = domain;
+    option.textContent = domain;
+    filterDomain.appendChild(option);
+  });
+}
 
+function applyFilters() {
+  let data = [...filteredData];
+
+  // Lọc theo domain
+  const selectedDomain = filterDomain.value;
+  if (selectedDomain) {
+    data = data.filter(line => line.split(':')[0].endsWith('@' + selectedDomain));
+  }
+
+  // Lọc theo độ dài password
+  const lengthFilter = filterLength.value;
+  if (lengthFilter) {
+    data = data.filter(line => {
+      const password = line.substring(line.indexOf(':') + 1);
+      const len = password.length;
+      if (lengthFilter === 'short') return len <= 8;
+      if (lengthFilter === 'medium') return len > 8 && len <= 15;
+      if (lengthFilter === 'long') return len > 15;
+      return true;
+    });
+  }
+
+  // Tìm kiếm
+  const query = searchInput.value.trim().toLowerCase();
+  if (query) {
+    data = data.filter(line => line.toLowerCase().includes(query));
+  }
+
+  currentDisplayData = data;
+  renderResultList(currentDisplayData);
+}
+
+searchInput.addEventListener('input', applyFilters);
+filterDomain.addEventListener('change', applyFilters);
+filterLength.addEventListener('change', applyFilters);
+
+// ============ HIỂN THỊ DANH SÁCH KẾT QUẢ ============
 function renderResultList(data) {
   resultList.innerHTML = '';
   if (data.length === 0) {
@@ -312,17 +369,24 @@ function renderResultList(data) {
       li.textContent = line;
       li.title = 'Click để xóa dòng này';
       li.addEventListener('click', () => {
-        // Xóa dòng khỏi filteredData
+        // Xóa dòng khỏi filteredData và resultByFile
         const originalIndex = filteredData.indexOf(line);
         if (originalIndex !== -1) {
           filteredData.splice(originalIndex, 1);
-          // Cập nhật lại danh sách hiển thị
-          currentDisplayData = currentDisplayData.filter(d => d !== line);
-          renderResultList(currentDisplayData);
-          // Cập nhật thống kê
+          // Cập nhật resultByFile: tìm file chứa dòng này và xóa
+          for (const fileName in resultByFile) {
+            const idx = resultByFile[fileName].indexOf(line);
+            if (idx !== -1) {
+              resultByFile[fileName].splice(idx, 1);
+              break;
+            }
+          }
+          // Cập nhật giao diện
+          applyFilters(); // Gọi lại lọc để cập nhật danh sách hiển thị
           validLinesSpan.textContent = filteredData.length;
           removedLinesSpan.textContent = parseInt(totalLinesSpan.textContent) - filteredData.length;
           displayDomainStats(filteredData);
+          populateDomainFilter(filteredData);
         }
       });
       resultList.appendChild(li);
@@ -363,6 +427,7 @@ function updateCountdownDisplay(seconds) {
 
 function clearData() {
   filteredData = [];
+  resultByFile = {};
   selectedFiles = [];
   resultDiv.classList.add('hidden');
   timerDiv.classList.add('hidden');
@@ -387,9 +452,12 @@ function resetUI() {
   if (autoDeleteTimerId) clearTimeout(autoDeleteTimerId);
   if (countdownInterval) clearInterval(countdownInterval);
   progressFill.style.width = '0%';
+  searchInput.value = '';
+  filterDomain.innerHTML = '<option value="">Tất cả domain</option>';
+  filterLength.value = '';
 }
 
-// ============ TẢI FILE KẾT QUẢ ============
+// ============ TẢI FILE KẾT QUẢ (GỘP) ============
 btnDownload.addEventListener('click', () => {
   if (filteredData.length === 0) {
     alert('Không có dữ liệu để tải.');
@@ -421,4 +489,86 @@ btnDownload.addEventListener('click', () => {
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+});
+
+// ============ TẢI ZIP (RIÊNG TỪNG FILE) ============
+btnDownloadZip.addEventListener('click', async () => {
+  if (Object.keys(resultByFile).length === 0) {
+    alert('Không có dữ liệu để tải.');
+    return;
+  }
+  const zip = new JSZip();
+  const folder = zip.folder('filtered_results');
+  Object.entries(resultByFile).forEach(([fileName, lines]) => {
+    if (lines.length > 0) {
+      const cleanName = fileName.replace(/\.[^/.]+$/, '') + '_filtered.txt';
+      folder.file(cleanName, lines.join('\n'));
+    }
+  });
+  try {
+    const blob = await zip.generateAsync({ type: 'blob' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'filtered_results.zip';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  } catch (error) {
+    console.error('Lỗi tạo zip:', error);
+    alert('Có lỗi khi tạo file zip.');
+  }
+});
+
+// ============ XEM VÀ TẢI TỪNG FILE RIÊNG ============
+btnShowIndividual.addEventListener('click', () => {
+  const fileNames = Object.keys(resultByFile);
+  if (fileNames.length === 0) {
+    alert('Không có dữ liệu.');
+    return;
+  }
+  individualFileList.innerHTML = '';
+  fileNames.forEach(fileName => {
+    const lines = resultByFile[fileName];
+    const li = document.createElement('li');
+    li.innerHTML = `
+      <span>${escapeHtml(fileName)} (${lines.length} dòng)</span>
+      <button class="download-btn" title="Tải file này"><i class="fas fa-download"></i></button>
+    `;
+    li.querySelector('.download-btn').addEventListener('click', () => {
+      const content = lines.join('\n');
+      const blob = new Blob([content], { type: 'text/plain;charset=utf-8' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = fileName.replace(/\.[^/.]+$/, '') + '_filtered.txt';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    });
+    individualFileList.appendChild(li);
+  });
+  individualModal.classList.remove('hidden');
+});
+
+btnCloseIndividual.addEventListener('click', () => {
+  individualModal.classList.add('hidden');
+});
+
+// ============ COPY TẤT CẢ ============
+btnCopy.addEventListener('click', async () => {
+  if (filteredData.length === 0) {
+    alert('Không có dữ liệu để copy.');
+    return;
+  }
+  const content = filteredData.join('\n');
+  try {
+    await navigator.clipboard.writeText(content);
+    alert('Đã copy toàn bộ kết quả vào clipboard!');
+  } catch (err) {
+    console.error('Copy thất bại:', err);
+    alert('Không thể copy, trình duyệt không hỗ trợ. Vui lòng chọn thủ công.');
+  }
 });
