@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Email:Password Filter - An toàn & Bảo mật</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+  <!-- Overlay cảnh báo -->
+  <div id="warning-overlay" class="overlay">
+    <div class="modal">
+      <div class="modal-icon">
+        <i class="fas fa-shield-alt"></i>
+      </div>
+      <h2>Cảnh báo bảo mật</h2>
+      <p>
+        Ứng dụng này sẽ <strong>xử lý file của bạn hoàn toàn trên trình duyệt</strong>. 
+        Không có dữ liệu nào được tải lên máy chủ. 
+        Kết quả sẽ tự động bị xóa khỏi bộ nhớ sau <strong>15 phút</strong> 
+        hoặc ngay khi bạn đóng tab.
+      </p>
+      <p>
+        Bằng cách nhấn "Đồng ý", bạn xác nhận rằng bạn hiểu và chấp nhận các điều khoản trên.
+      </p>
+      <div class="modal-actions">
+        <button id="btn-disagree" class="btn btn-secondary">Từ chối</button>
+        <button id="btn-agree" class="btn btn-primary">Đồng ý và tiếp tục</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Nội dung chính -->
+  <div id="main-content" class="main-content hidden">
+    <header class="header">
+      <h1><i class="fas fa-envelope"></i> Email:Password Filter</h1>
+      <button id="theme-toggle" class="theme-toggle" aria-label="Chuyển đổi chế độ sáng/tối">
+        <i class="fas fa-moon"></i>
+      </button>
+    </header>
+
+    <main class="container">
+      <div class="upload-area" id="upload-area">
+        <i class="fas fa-cloud-upload-alt"></i>
+        <p>Kéo thả file vào đây hoặc <span class="browse">chọn file</span></p>
+        <input type="file" id="file-input" accept=".txt,.csv,.log,.text,.dat,.lst,.json,.xml,.html,.md,.rtf,.ini,.conf,.properties,.yaml,.yml" hidden>
+        <small>Hỗ trợ mọi định dạng văn bản. Chỉ giữ lại dòng có dạng email:password hợp lệ.</small>
+      </div>
+
+      <div id="processing" class="processing hidden">
+        <div class="spinner"></div>
+        <p>Đang xử lý file...</p>
+      </div>
+
+      <div id="result" class="result hidden">
+        <div class="result-stats">
+          <span><i class="fas fa-file-alt"></i> Tổng dòng: <strong id="total-lines">0</strong></span>
+          <span><i class="fas fa-check-circle"></i> Dòng hợp lệ: <strong id="valid-lines">0</strong></span>
+          <span><i class="fas fa-trash-alt"></i> Đã loại bỏ: <strong id="removed-lines">0</strong></span>
+        </div>
+        <div class="result-actions">
+          <button id="btn-download" class="btn btn-download"><i class="fas fa-download"></i> Tải file kết quả</button>
+          <button id="btn-reset" class="btn btn-reset"><i class="fas fa-undo"></i> Xử lý file khác</button>
+        </div>
+        <div class="preview">
+          <h3>Xem trước (tối đa 50 dòng)</h3>
+          <pre id="preview-content"></pre>
+        </div>
+      </div>
+
+      <div id="auto-delete-timer" class="timer hidden">
+        <i class="fas fa-clock"></i> Dữ liệu sẽ tự động xóa sau: <span id="countdown">15:00</span>
+      </div>
+    </main>
+
+    <footer class="footer">
+      <p>🔒 Dữ liệu của bạn không bao giờ rời khỏi trình duyệt</p>
+    </footer>
+  </div>
+
+  <!-- Thông báo từ chối -->
+  <div id="denied-message" class="denied hidden">
+    <i class="fas fa-lock"></i>
+    <h2>Bạn đã từ chối điều khoản</h2>
+    <p>Ứng dụng không thể hoạt động nếu không có sự đồng ý của bạn.</p>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
