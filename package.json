@@ -1,0 +1,13 @@
+{
+  "name": "email-password-filter",
+  "version": "1.0.0",
+  "description": "Web app lọc email:password chạy trên trình duyệt, không lưu trữ dữ liệu",
+  "main": "index.html",
+  "scripts": {
+    "dev": "serve .",
+    "build": "echo 'No build step needed'"
+  },
+  "keywords": ["filter", "email", "password", "client-side"],
+  "author": "Your Name",
+  "license": "MIT"
+}
